@@ -1,6 +1,8 @@
 export type JourneyLeg = {
   mode: string;
   source: string;
+  fromCoords: any;
+  toCoords: any;
   destination: string;
   duration: number;
   cost: number;

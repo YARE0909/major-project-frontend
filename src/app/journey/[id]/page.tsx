@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Journey } from "@/types/journey";
 import { useParams } from "next/navigation";
-import { Clock, IndianRupee, QrCode, Map } from "lucide-react";
-import JourneyMap from "@/components/JourneyMap";
+import { Clock, IndianRupee, QrCode, Map as MapIcon, Footprints, ArrowLeft, ArrowRight } from "lucide-react";
+import Map from "@/components/Map";
 
 export default function JourneyDetailsPage() {
   const params = useParams();
@@ -37,7 +37,9 @@ export default function JourneyDetailsPage() {
       {/* 🌟 BRANDING */}
       <div className="mb-4 flex flex-col items-center text-center">
         <div className="flex items-center gap-2">
-          <span className="text-lg font-extrabold tracking-tight">TravelNest</span>
+          <span className="text-lg font-extrabold tracking-tight">
+            TravelNest
+          </span>
         </div>
         <p className="mt-1 text-xs text-zinc-400 font-bold">
           One app. Every journey.
@@ -92,28 +94,41 @@ export default function JourneyDetailsPage() {
 
         {/* 🧭 JOURNEY STEPS */}
         <div className="rounded-2xl border border-white/10 bg-zinc-900/90 p-5 shadow-lg">
-          <h2 className="mb-4 text-sm font-semibold text-zinc-200">
-            Journey Steps
-          </h2>
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-4">
+            <Footprints size={14} className="text-orange-400" />
+            <h2 className="text-sm font-bold tracking-wide text-zinc-200">
+              JOURNEY STEPS
+            </h2>
+          </div>
 
-          <div className="space-y-5">
+          {/* Steps */}
+          <div className="space-y-4">
             {journey.legs.map((leg, idx) => (
-              <div key={idx} className="flex gap-4">
+              <div
+                key={idx}
+                className="relative flex gap-4 rounded-xl bg-zinc-800/40 p-3 ring-1 ring-white/5"
+              >
                 {/* Timeline */}
                 <div className="flex flex-col items-center">
-                  <div className="h-3 w-3 rounded-full bg-orange-400" />
-                  {idx !== journey.legs.length - 1 && (
-                    <div className="mt-1 h-full w-px bg-zinc-600" />
-                  )}
+                  <div className="h-2.5 w-2.5 rounded-full bg-orange-400 mt-1" />
                 </div>
 
                 {/* Content */}
-                <div className="pb-1">
-                  <p className="text-xs font-bold uppercase tracking-wide text-zinc-300">
-                    {leg.mode}
-                  </p>
-                  <p className="text-sm text-zinc-400">
-                    {leg.source} → {leg.destination}
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold uppercase tracking-wide text-orange-300">
+                      {leg.mode}
+                    </p>
+                    <span className="text-xs text-zinc-500 font-bold">
+                      Step {idx + 1}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 text-xs text-zinc-300 font-bold">
+                    {leg.source}
+                    <ArrowRight size={12} className="mx-1 inline" />
+                    {leg.destination}
                   </p>
                 </div>
               </div>
@@ -124,14 +139,12 @@ export default function JourneyDetailsPage() {
         {/* 🗺️ MAP PREVIEW */}
         <div className="rounded-2xl border border-white/10 bg-zinc-900/90 p-4 shadow-lg">
           <div className="mb-2 flex items-center gap-2">
-            <Map size={14} className="text-orange-400" />
-            <h2 className="text-xs font-semibold text-zinc-300">
-              Route Overview
-            </h2>
+            <MapIcon size={14} className="text-orange-400" />
+            <h2 className="text-sm font-bold text-zinc-200">ROUTE OVERVIEW</h2>
           </div>
 
           <div className="h-44 w-full overflow-hidden rounded-xl border border-zinc-800">
-            <JourneyMap legs={journey.legs} />
+            <Map legs={journey.legs} />
           </div>
         </div>
       </div>

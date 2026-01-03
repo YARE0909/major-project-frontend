@@ -4,7 +4,7 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { JourneyRoute } from "@/types/journey";
 import RouteCard from "@/components/RouteCard";
-import JourneyMap from "@/components/JourneyMap";
+import Map from "@/components/Map";
 import { MapPin, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -14,6 +14,7 @@ export default function JourneyPage() {
   const [routes, setRoutes] = useState<JourneyRoute[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<JourneyRoute | null>(null);
 
   const router = useRouter();
 
@@ -22,7 +23,11 @@ export default function JourneyPage() {
     setError(null);
     try {
       const res = await api.post("/journey/plan", { source, destination });
-      setRoutes(res.data.routes || []);
+      const newRoutes = res.data.routes || [];
+
+      setRoutes(newRoutes);
+      console.log("Planned Routes:", newRoutes);
+      setSelectedRoute(newRoutes[0] ?? null); // 👈 IMPORTANT
     } catch (err: any) {
       setError(err?.response?.data?.error || "Failed to plan journey");
     } finally {
@@ -45,9 +50,7 @@ export default function JourneyPage() {
     <main className="relative h-screen w-full overflow-hidden bg-black">
       {/* MAP */}
       <div className="absolute inset-0 z-0">
-        <JourneyMap
-          legs={routes.length > 0 ? routes[0].legs : []}
-        />
+        <Map legs={selectedRoute?.legs ?? []} />
       </div>
 
       {/* MAP FADE (mobile only) */}
@@ -70,6 +73,8 @@ export default function JourneyPage() {
             error={error}
             routes={routes}
             bookRoute={bookRoute}
+            selectedRoute={selectedRoute}
+            setSelectedRoute={setSelectedRoute}
           />
         </div>
       </div>
@@ -87,6 +92,8 @@ export default function JourneyPage() {
             error={error}
             routes={routes}
             bookRoute={bookRoute}
+            selectedRoute={selectedRoute}
+            setSelectedRoute={setSelectedRoute}
           />
         </div>
       </div>
@@ -106,6 +113,8 @@ function Content({
   error,
   routes,
   bookRoute,
+  selectedRoute,
+  setSelectedRoute,
 }: any) {
   return (
     <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
@@ -120,7 +129,10 @@ function Content({
       {/* INPUTS */}
       <div className="space-y-3">
         <div className="relative">
-          <MapPin size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400" />
+          <MapPin
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400"
+          />
           <input
             placeholder="From where?"
             className="w-full rounded-xl bg-zinc-800/70 border border-zinc-700/60 pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500/30"
@@ -130,7 +142,10 @@ function Content({
         </div>
 
         <div className="relative">
-          <ArrowRight size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400" />
+          <ArrowRight
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400"
+          />
           <input
             placeholder="Where to?"
             className="w-full rounded-xl bg-zinc-800/70 border border-zinc-700/60 pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500/30"
@@ -142,7 +157,7 @@ function Content({
         <button
           onClick={planJourney}
           disabled={loading}
-          className="w-full rounded-xl bg-orange-500 py-3 font-bold text-black hover:bg-orange-400 active:scale-[0.98] disabled:opacity-60 transition"
+          className="w-full rounded-xl bg-orange-500 py-3 font-bold text-black hover:bg-orange-400 active:scale-[0.98] disabled:opacity-60 transition cursor-pointer"
         >
           {loading ? "Finding routes…" : "Find routes"}
         </button>
@@ -161,6 +176,8 @@ function Content({
             key={route.id}
             route={route}
             allRoutes={routes}
+            isSelected={selectedRoute?.id === route.id}
+            onPreview={setSelectedRoute}
             onSelect={bookRoute}
           />
         ))}

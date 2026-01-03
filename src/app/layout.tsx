@@ -1,4 +1,5 @@
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import { ReactNode } from "react";
 
 export const metadata = {

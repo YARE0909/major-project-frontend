@@ -1,42 +1,120 @@
 "use client";
 
 import { JourneyRoute } from "@/types/journey";
-import { Clock, IndianRupee } from "lucide-react";
+import { Clock, IndianRupee, ArrowRight, Zap, Wallet } from "lucide-react";
 
 type Props = {
   route: JourneyRoute;
+  allRoutes: JourneyRoute[];
   onSelect: (route: JourneyRoute) => void;
 };
 
-export default function RouteCard({ route, onSelect }: Props) {
-  return (
-    <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
-      <h3 className="text-lg font-semibold mb-2">
-        {route.name || "Route Option"}
-      </h3>
+export default function RouteCard({ route, allRoutes, onSelect }: Props) {
+  const minCost = Math.min(...allRoutes.map((r) => r.totalCost));
+  const minTime = Math.min(...allRoutes.map((r) => r.totalTime));
+  const maxCost = Math.max(...allRoutes.map((r) => r.totalCost));
+  const maxTime = Math.max(...allRoutes.map((r) => r.totalTime));
 
-      <div className="flex gap-4 text-sm text-zinc-400 mb-3">
+  const costScore =
+    maxCost === minCost
+      ? 100
+      : 100 - ((route.totalCost - minCost) / (maxCost - minCost)) * 100;
+
+  const timeScore =
+    maxTime === minTime
+      ? 100
+      : 100 - ((route.totalTime - minTime) / (maxTime - minTime)) * 100;
+
+  const isCheapest = route.totalCost === minCost;
+  const isFastest = route.totalTime === minTime;
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-zinc-800/60 backdrop-blur p-4 transition hover:border-orange-500/40 hover:bg-zinc-800/80">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <h3 className="text-base font-semibold">
+            {route.name || "Route option"}
+          </h3>
+          <p className="text-xs text-zinc-400 font-bold">
+            {route.legs.length} segments · Multimodal
+          </p>
+        </div>
+
+        {/* Badges */}
+        <div className="flex gap-1">
+          {isFastest && (
+            <span className="flex items-center gap-1 rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400 font-bold">
+              <Zap size={12} /> Fastest
+            </span>
+          )}
+          {isCheapest && (
+            <span className="flex items-center gap-1 rounded-full bg-green-500/15 px-2 py-0.5 text-xs text-green-400 font-bold">
+              <Wallet size={12} /> Cheapest
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Time & Cost */}
+      <div className="flex items-center gap-4 text-sm text-zinc-300 mb-3 font-bold">
         <span className="flex items-center gap-1">
-          <Clock size={14} /> {route.totalTime} mins
+          <Clock size={14} className="text-orange-400" />
+          {route.totalTime} mins
         </span>
-        <span className="flex items-center gap-1">
-          <IndianRupee size={14} /> {route.totalCost}
+        <span className="flex items-center">
+          <IndianRupee size={14} className="text-orange-400" />
+          {route.totalCost}
         </span>
       </div>
 
-      <ul className="text-sm text-zinc-300 mb-4 space-y-1">
+      {/* Comparison bars */}
+      <div className="mb-3 space-y-2 flex items-start justify-between gap-2">
+        <div className="w-full">
+          <p className="text-xs text-zinc-400 mb-1 font-bold">
+            Time efficiency
+          </p>
+          <div className="h-1.5 w-full rounded bg-zinc-700">
+            <div
+              className="h-full rounded bg-orange-500"
+              style={{ width: `${timeScore}%` }}
+            />
+          </div>
+        </div>
+        <div className="w-full">
+          <p className="text-xs text-zinc-400 mb-1 font-bold">
+            Cost efficiency
+          </p>
+          <div className="h-1.5 w-full rounded bg-zinc-700">
+            <div
+              className="h-full rounded bg-green-500"
+              style={{ width: `${costScore}%` }}
+            />
+          </div>
+        </div>
+      </div>
+      
+      {/* Route steps (collapsed feel) */}
+      <div className="mb-4 space-y-1">
         {route.legs.map((leg, idx) => (
-          <li key={idx}>
-            {idx + 1}. {leg.mode}: {leg.source} → {leg.destination}
-          </li>
+          <div key={idx} className="flex items-center text-xs text-zinc-400">
+            <span className="min-w-[48px] text-zinc-300 font-bold">
+              {leg.mode}
+            </span>
+            <ArrowRight size={12} className="mx-1 opacity-40" />
+            <span className="truncate font-bold">
+              {leg.source} → {leg.destination}
+            </span>
+          </div>
         ))}
-      </ul>
+      </div>
 
+      {/* CTA */}
       <button
         onClick={() => onSelect(route)}
-        className="w-full py-2 rounded bg-blue-600 hover:bg-blue-700"
+        className="w-full rounded-xl bg-orange-500 py-2.5 text-sm font-bold cursor-pointer text-black transition hover:bg-orange-400 active:scale-[0.98]"
       >
-        Select & Book
+        Select route
       </button>
     </div>
   );

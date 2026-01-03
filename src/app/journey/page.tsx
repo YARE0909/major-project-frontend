@@ -111,10 +111,9 @@ function Content({
     <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
       {/* BRANDING */}
       <div className="flex items-center gap-2 mb-2">
-        <div className="h-2.5 w-2.5 rounded-full bg-orange-400" />
         <h1 className="text-lg font-bold tracking-tight">TravelNest</h1>
       </div>
-      <p className="text-xs text-zinc-400 -mt-2">
+      <p className="text-xs text-zinc-400 -mt-2 font-bold">
         One app. Every journey.
       </p>
 

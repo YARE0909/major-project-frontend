@@ -34,6 +34,16 @@ export default function JourneyDetailsPage() {
 
   return (
     <main className="min-h-screen bg-black px-4 py-6">
+      {/* 🌟 BRANDING */}
+      <div className="mb-4 flex flex-col items-center text-center">
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-extrabold tracking-tight">TravelNest</span>
+        </div>
+        <p className="mt-1 text-xs text-zinc-400 font-bold">
+          One app. Every journey.
+        </p>
+      </div>
+
       <div className="mx-auto max-w-md space-y-6">
         {/* 🎫 TRAVEL TICKET (HERO) */}
         <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/95 shadow-2xl">

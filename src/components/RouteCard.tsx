@@ -122,7 +122,7 @@ export default function RouteCard({
       <div className="mb-4 space-y-1">
         {route.legs.map((leg, idx) => (
           <div key={idx} className="flex items-center text-xs text-zinc-400">
-            <span className="min-w-[48px] text-zinc-300 font-bold">
+            <span className="min-w-12 text-zinc-300 font-bold">
               {leg.mode}
             </span>
             <ArrowRight size={12} className="mx-1 opacity-40" />
@@ -139,7 +139,7 @@ export default function RouteCard({
           e.stopPropagation(); // 👈 prevents preview click
           onSelect(route);
         }}
-        className="w-full rounded-xl bg-orange-500 py-2.5 text-sm font-bold text-black transition hover:bg-orange-400 active:scale-[0.98]"
+        className="w-full rounded-xl bg-orange-500 py-2.5 text-sm font-bold text-black transition hover:bg-orange-400 active:scale-[0.98] cursor-pointer"
       >
         Select route
       </button>

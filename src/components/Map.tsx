@@ -1,7 +1,7 @@
 "use client";
 
+import { MapProps } from "@/types/journey";
 import dynamic from "next/dynamic";
-import { MapProps } from "@/maps/types";
 
 /**
  * CHANGE THIS IMPORT to switch providers

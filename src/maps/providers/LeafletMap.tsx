@@ -1,11 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { MapProps } from "@/maps/types";
 import "@/lib/leaflet";
 import { useOSRMRoute } from "../hooks/useOSRMRoute";
+import { MapProps } from "@/types/journey";
 
-// Leaflet dynamic imports
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
   { ssr: false }
@@ -30,7 +29,6 @@ export default function LeafletMap({
   const firstLeg = legs?.[0];
   const lastLeg = legs?.[legs.length - 1];
 
-  // 🟢 Fallback center (Chennai or current location later)
   const fallbackCenter: [number, number] = [13.0827, 80.2707];
 
   const from: [number, number] | undefined = firstLeg
@@ -57,11 +55,9 @@ export default function LeafletMap({
       >
         <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png" />
 
-        {/* Start / End markers */}
         {from && <Marker position={from} />}
         {to && <Marker position={to} />}
 
-        {/* Route */}
         {route && (
           <>
             <Polyline

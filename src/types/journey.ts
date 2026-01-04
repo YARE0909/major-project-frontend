@@ -1,4 +1,5 @@
 export type JourneyLeg = {
+  id: string;
   mode: string;
   source: string;
   fromCoords: any;
@@ -6,6 +7,7 @@ export type JourneyLeg = {
   destination: string;
   duration: number;
   cost: number;
+  travelPass: TravelPass;
 };
 
 export type TravelPass = {
@@ -38,4 +40,11 @@ export type JourneyRoute = {
   totalTime: number;
   totalCost: number;
   legs: JourneyLeg[];
+};
+
+export type MapProps = {
+  legs: JourneyLeg[];
+  className?: string;
+  interactive?: boolean;
+  showCurrentLocation?: boolean;
 };

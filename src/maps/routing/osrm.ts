@@ -1,7 +1,7 @@
 export type RouteGeometry = {
-  coordinates: [number, number][]; // [lat, lng]
-  distance: number; // meters
-  duration: number; // seconds
+  coordinates: [number, number][];
+  distance: number;
+  duration: number;
 };
 
 export async function getOSRMRoute(

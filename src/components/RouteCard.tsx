@@ -1,7 +1,14 @@
 "use client";
 
 import { JourneyRoute } from "@/types/journey";
-import { Clock, IndianRupee, ArrowRight, Zap, Wallet } from "lucide-react";
+import {
+  Clock,
+  IndianRupee,
+  ArrowRight,
+  Zap,
+  Wallet,
+  ShieldAlert,
+} from "lucide-react";
 
 type Props = {
   route: JourneyRoute;
@@ -18,6 +25,9 @@ export default function RouteCard({
   onPreview,
   onSelect,
 }: Props) {
+
+  /* ---------- cost/time comparison ---------- */
+
   const minCost = Math.min(...allRoutes.map((r) => r.totalCost));
   const minTime = Math.min(...allRoutes.map((r) => r.totalTime));
   const maxCost = Math.max(...allRoutes.map((r) => r.totalCost));
@@ -36,6 +46,29 @@ export default function RouteCard({
   const isCheapest = route.totalCost === minCost;
   const isFastest = route.totalTime === minTime;
 
+  /* ---------- accessibility score ---------- */
+
+  const avgAccessibility =
+    route.legs.length > 0
+      ? route.legs.reduce(
+          (acc, leg) => acc + (leg.accessibility?.score ?? 100),
+          0
+        ) / route.legs.length
+      : 100;
+
+  const accessibilityScore = Math.max(0, Math.min(100, avgAccessibility));
+
+  /* ---------- failure risk ---------- */
+
+  const failureRisk =
+    route.failureProbability !== undefined
+      ? route.failureProbability <= 1
+        ? route.failureProbability * 100
+        : route.failureProbability
+      : 0;
+
+  const riskScore = Math.max(0, Math.min(100, failureRisk));
+
   return (
     <div
       onClick={() => onPreview(route)}
@@ -53,7 +86,9 @@ export default function RouteCard({
         }
       `}
     >
-      {/* Header */}
+
+      {/* ---------- HEADER ---------- */}
+
       <div className="flex items-start justify-between mb-2">
         <div>
           <h3 className="text-base font-semibold">
@@ -64,7 +99,6 @@ export default function RouteCard({
           </p>
         </div>
 
-        {/* Badges */}
         <div className="flex gap-1">
           {isFastest && (
             <span className="flex items-center gap-1 rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400 font-bold">
@@ -79,19 +113,63 @@ export default function RouteCard({
         </div>
       </div>
 
-      {/* Time & Cost */}
+      {/* ---------- TIME & COST ---------- */}
+
       <div className="flex items-center gap-4 text-sm text-zinc-300 mb-3 font-bold">
         <span className="flex items-center gap-1">
           <Clock size={14} className="text-orange-400" />
           {route.totalTime} mins
         </span>
+
         <span className="flex items-center gap-1">
           <IndianRupee size={14} className="text-orange-400" />
           {route.totalCost}
         </span>
       </div>
 
-      {/* Comparison bars */}
+      {/* ---------- ACCESSIBILITY ---------- */}
+
+      <div className="flex items-center justify-between text-xs mb-2">
+        <span className="text-zinc-400 font-bold">
+          Accessibility
+        </span>
+
+        <span
+          className={`font-bold ${
+            accessibilityScore > 80
+              ? "text-green-400"
+              : accessibilityScore > 50
+              ? "text-yellow-400"
+              : "text-red-400"
+          }`}
+        >
+          {Math.round(accessibilityScore)}%
+        </span>
+      </div>
+
+      {/* ---------- FAILURE RISK ---------- */}
+
+      <div className="flex items-center justify-between text-xs mb-3">
+        <span className="flex items-center gap-1 text-zinc-400 font-bold">
+          <ShieldAlert size={12} />
+          Failure Risk
+        </span>
+
+        <span
+          className={`font-bold ${
+            riskScore < 20
+              ? "text-green-400"
+              : riskScore < 40
+              ? "text-yellow-400"
+              : "text-red-400"
+          }`}
+        >
+          {riskScore.toFixed(0)}%
+        </span>
+      </div>
+
+      {/* ---------- COMPARISON BARS ---------- */}
+
       <div className="mb-3 space-y-2 flex gap-2">
         <div className="w-full">
           <p className="text-xs text-zinc-400 mb-1 font-bold">
@@ -118,14 +196,17 @@ export default function RouteCard({
         </div>
       </div>
 
-      {/* Route steps */}
+      {/* ---------- ROUTE STEPS ---------- */}
+
       <div className="mb-4 space-y-1">
         {route.legs.map((leg, idx) => (
           <div key={idx} className="flex items-center text-xs text-zinc-400">
             <span className="min-w-12 text-zinc-300 font-bold">
               {leg.mode}
             </span>
+
             <ArrowRight size={12} className="mx-1 opacity-40" />
+
             <span className="truncate font-bold">
               {leg.source} → {leg.destination}
             </span>
@@ -133,10 +214,11 @@ export default function RouteCard({
         ))}
       </div>
 
-      {/* CTA */}
+      {/* ---------- CTA ---------- */}
+
       <button
         onClick={(e) => {
-          e.stopPropagation(); // 👈 prevents preview click
+          e.stopPropagation();
           onSelect(route);
         }}
         className="w-full rounded-xl bg-orange-500 py-2.5 text-sm font-bold text-black transition hover:bg-orange-400 active:scale-[0.98] cursor-pointer"

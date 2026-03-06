@@ -14,6 +14,13 @@ export default function JourneyPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<JourneyRoute | null>(null);
+  const [accessibility, setAccessibility] = useState({
+    wheelchair: false,
+    blind: false,
+    deaf: false,
+    cognitive: false,
+    fatigue: false,
+  });
 
   const router = useRouter();
 
@@ -21,7 +28,11 @@ export default function JourneyPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.post("/journey/plan", { source, destination });
+      const res = await api.post("/journey/plan", {
+        source,
+        destination,
+        accessibility,
+      });
       const newRoutes = res.data.routes || [];
 
       setRoutes(newRoutes);
@@ -68,6 +79,8 @@ export default function JourneyPage() {
             bookRoute={bookRoute}
             selectedRoute={selectedRoute}
             setSelectedRoute={setSelectedRoute}
+            accessibility={accessibility}
+            setAccessibility={setAccessibility}
           />
         </div>
       </div>
@@ -86,6 +99,8 @@ export default function JourneyPage() {
             bookRoute={bookRoute}
             selectedRoute={selectedRoute}
             setSelectedRoute={setSelectedRoute}
+            accessibility={accessibility}
+            setAccessibility={setAccessibility}
           />
         </div>
       </div>

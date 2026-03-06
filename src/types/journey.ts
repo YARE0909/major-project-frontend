@@ -1,15 +1,17 @@
 export type JourneyLeg = {
-  id: string;
   mode: string;
   source: string;
-  fromCoords: any;
-  toCoords: any;
   destination: string;
   duration: number;
   cost: number;
-  travelPass: TravelPass;
-};
 
+  accessibility?: {
+    score: number;
+    issues: string[];
+  };
+
+  failureProbability?: number;
+};
 export type TravelPass = {
   id: string;
   journeyId: string;
@@ -32,16 +34,20 @@ export type Journey = {
   travelPass?: TravelPass;
 };
 
+
 export type JourneyRoute = {
   id: string;
-  name?: string;
+  name: string;
   source: string;
   destination: string;
+
+  legs: JourneyLeg[];
+
   totalTime: number;
   totalCost: number;
-  legs: JourneyLeg[];
-};
 
+  failureProbability?: number;
+};
 export type MapProps = {
   legs: JourneyLeg[];
   className?: string;

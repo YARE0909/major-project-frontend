@@ -2,6 +2,23 @@ import RouteCard from "@/components/RouteCard";
 import { JourneyRoute } from "@/types/journey";
 import { ArrowRight, MapPin } from "lucide-react";
 
+type Props = {
+  source: string;
+  setSource: (v: string) => void;
+  destination: string;
+  setDestination: (v: string) => void;
+  planJourney: () => void;
+  loading: boolean;
+  error: string | null;
+  routes: JourneyRoute[];
+  bookRoute: (route: JourneyRoute) => void;
+  selectedRoute: JourneyRoute | null;
+  setSelectedRoute: (route: JourneyRoute) => void;
+
+  accessibility: any;
+  setAccessibility: any;
+};
+
 export default function Content({
   source,
   setSource,
@@ -14,7 +31,9 @@ export default function Content({
   bookRoute,
   selectedRoute,
   setSelectedRoute,
-}: any) {
+  accessibility,
+  setAccessibility
+}: Props) {
   return (
     <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
       <div className="flex items-center gap-2 mb-2">
@@ -49,6 +68,40 @@ export default function Content({
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
           />
+        </div>
+
+        {/* Accessibility Preferences */}
+        <div className="rounded-xl bg-zinc-800/60 border border-zinc-700/60 p-3 space-y-2">
+          <p className="text-xs text-zinc-400 font-bold">
+            Accessibility preferences
+          </p>
+
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {[
+              ["wheelchair", "Wheelchair"],
+              ["blind", "Blind / Low Vision"],
+              ["deaf", "Deaf"],
+              ["cognitive", "Cognitive"],
+              ["fatigue", "Fatigue Sensitive"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() =>
+                  setAccessibility((prev: any) => ({
+                    ...prev,
+                    [key]: !prev[key],
+                  }))
+                }
+                className={`rounded-lg px-2 py-1 text-left border transition cursor-pointer ${
+                  accessibility[key]
+                    ? "bg-orange-500 text-black border-orange-400"
+                    : "bg-zinc-700 border-zinc-600"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <button

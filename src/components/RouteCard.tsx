@@ -1,5 +1,3 @@
-"use client";
-
 import { JourneyRoute } from "@/types/journey";
 import {
   Clock,
@@ -25,7 +23,6 @@ export default function RouteCard({
   onPreview,
   onSelect,
 }: Props) {
-
   /* ---------- cost/time comparison ---------- */
 
   const minCost = Math.min(...allRoutes.map((r) => r.totalCost));
@@ -71,125 +68,137 @@ export default function RouteCard({
 
   return (
     <div
-      onClick={() => onPreview(route)}
+      onClick={() => {
+        onPreview(route);
+        onSelect(route);
+      }}
       className={`
         cursor-pointer
         rounded-2xl
         border
-        p-4
-        backdrop-blur
-        transition
+        p-4.5
+        transition-all
+        duration-300
+        flex flex-col
+        relative
+        overflow-hidden
         ${
           isSelected
-            ? "border-orange-500 bg-zinc-800/90 ring-2 ring-orange-500/30"
-            : "border-white/10 bg-zinc-800/60 hover:border-orange-500/40 hover:bg-zinc-800/80"
+            ? "border-indigo-500/50 bg-indigo-500/5 shadow-[0_0_24px_rgba(99,102,241,0.1)] ring-1 ring-indigo-500/20"
+            : "border-neutral-800 bg-neutral-900/40 hover:border-neutral-700 hover:bg-neutral-800/60"
         }
       `}
     >
+      {/* Subtle background glow for selected state */}
+      {isSelected && (
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full pointer-events-none" />
+      )}
 
       {/* ---------- HEADER ---------- */}
-
-      <div className="flex items-start justify-between mb-2">
-        <div>
-          <h3 className="text-base font-semibold">
-            {route.name || "Route option"}
+      <div className="flex items-start justify-between mb-4 gap-3 relative z-10">
+        <div className="min-w-0">
+          <h3 className={`text-base font-bold truncate ${isSelected ? "text-indigo-100" : "text-white"}`}>
+            {route.name || "Route Option"}
           </h3>
-          <p className="text-xs text-zinc-400 font-bold">
-            {route.legs.length} segments · Multimodal
+          <p className="text-[11px] text-neutral-400 font-medium mt-1 uppercase tracking-widest flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+            {route.legs.length} Segments
           </p>
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
           {isFastest && (
-            <span className="flex items-center gap-1 rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-400 font-bold">
-              <Zap size={12} /> Fastest
+            <span className="flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] text-amber-400 font-bold uppercase tracking-wider shadow-sm shadow-amber-500/5">
+              <Zap size={10} className="fill-amber-500/50" /> Fastest
             </span>
           )}
           {isCheapest && (
-            <span className="flex items-center gap-1 rounded-full bg-green-500/15 px-2 py-0.5 text-xs text-green-400 font-bold">
-              <Wallet size={12} /> Cheapest
+            <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400 font-bold uppercase tracking-wider shadow-sm shadow-emerald-500/5">
+              <Wallet size={10} /> Cheapest
             </span>
           )}
         </div>
       </div>
 
       {/* ---------- TIME & COST ---------- */}
-
-      <div className="flex items-center gap-4 text-sm text-zinc-300 mb-3 font-bold">
-        <span className="flex items-center gap-1">
-          <Clock size={14} className="text-orange-400" />
-          {route.totalTime} mins
+      <div className="flex items-center gap-5 text-sm mb-5 font-semibold relative z-10 bg-neutral-950/50 p-3 rounded-xl border border-neutral-800/80">
+        <span className="flex items-center gap-2 text-neutral-100">
+          <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400">
+            <Clock size={14} />
+          </div>
+          {route.totalTime} min
         </span>
-
-        <span className="flex items-center gap-1">
-          <IndianRupee size={14} className="text-orange-400" />
+        <div className="w-[1px] h-6 bg-neutral-800" />
+        <span className="flex items-center gap-2 text-neutral-100">
+          <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-400">
+            <IndianRupee size={14} />
+          </div>
           {route.totalCost}
         </span>
       </div>
 
-      {/* ---------- ACCESSIBILITY ---------- */}
+      {/* ---------- ACCESSIBILITY & RISK ---------- */}
+      <div className="flex items-center justify-between mb-5 gap-4 relative z-10">
+        <div className="flex-1 flex flex-col gap-1">
+          <span className="text-[10px] text-neutral-500 font-semibold uppercase tracking-widest">
+            Accessibility
+          </span>
+          <span
+            className={`text-xs font-bold ${
+              accessibilityScore > 80
+                ? "text-emerald-400"
+                : accessibilityScore > 50
+                ? "text-amber-400"
+                : "text-red-400"
+            }`}
+          >
+            {Math.round(accessibilityScore)}% Score
+          </span>
+        </div>
 
-      <div className="flex items-center justify-between text-xs mb-2">
-        <span className="text-zinc-400 font-bold">
-          Accessibility
-        </span>
+        <div className="w-[1px] h-6 bg-neutral-800" />
 
-        <span
-          className={`font-bold ${
-            accessibilityScore > 80
-              ? "text-green-400"
-              : accessibilityScore > 50
-              ? "text-yellow-400"
-              : "text-red-400"
-          }`}
-        >
-          {Math.round(accessibilityScore)}%
-        </span>
-      </div>
-
-      {/* ---------- FAILURE RISK ---------- */}
-
-      <div className="flex items-center justify-between text-xs mb-3">
-        <span className="flex items-center gap-1 text-zinc-400 font-bold">
-          <ShieldAlert size={12} />
-          Failure Risk
-        </span>
-
-        <span
-          className={`font-bold ${
-            riskScore < 20
-              ? "text-green-400"
-              : riskScore < 40
-              ? "text-yellow-400"
-              : "text-red-400"
-          }`}
-        >
-          {riskScore.toFixed(0)}%
-        </span>
+        <div className="flex-1 flex flex-col gap-1 items-end">
+          <span className="flex items-center gap-1 text-[10px] text-neutral-500 font-semibold uppercase tracking-widest">
+            <ShieldAlert size={10} /> Failure Risk
+          </span>
+          <span
+            className={`text-xs font-bold ${
+              riskScore < 20
+                ? "text-emerald-400"
+                : riskScore < 40
+                ? "text-amber-400"
+                : "text-red-400"
+            }`}
+          >
+            {riskScore.toFixed(0)}% Risk
+          </span>
+        </div>
       </div>
 
       {/* ---------- COMPARISON BARS ---------- */}
-
-      <div className="mb-3 space-y-2 flex gap-2">
-        <div className="w-full">
-          <p className="text-xs text-zinc-400 mb-1 font-bold">
-            Time efficiency
-          </p>
-          <div className="h-1.5 w-full rounded bg-zinc-700">
+      <div className="mb-5 space-y-3 relative z-10">
+        <div className="w-full group">
+          <div className="flex justify-between text-[10px] text-neutral-400 mb-1.5 font-semibold uppercase tracking-widest">
+            <span>Time Efficiency</span>
+            <span className="text-blue-400">{Math.round(timeScore)}/100</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-neutral-800/80 overflow-hidden">
             <div
-              className="h-full rounded bg-orange-500 transition-all"
+              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-500"
               style={{ width: `${timeScore}%` }}
             />
           </div>
         </div>
 
-        <div className="w-full">
-          <p className="text-xs text-zinc-400 mb-1 font-bold">
-            Cost efficiency
-          </p>
-          <div className="h-1.5 w-full rounded bg-zinc-700">
+        <div className="w-full group">
+          <div className="flex justify-between text-[10px] text-neutral-400 mb-1.5 font-semibold uppercase tracking-widest">
+            <span>Cost Efficiency</span>
+            <span className="text-emerald-400">{Math.round(costScore)}/100</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-neutral-800/80 overflow-hidden">
             <div
-              className="h-full rounded bg-green-500 transition-all"
+              className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-500"
               style={{ width: `${costScore}%` }}
             />
           </div>
@@ -197,34 +206,19 @@ export default function RouteCard({
       </div>
 
       {/* ---------- ROUTE STEPS ---------- */}
-
-      <div className="mb-4 space-y-1">
+      <div className="space-y-2 pt-4 border-t border-neutral-800/80 relative z-10">
         {route.legs.map((leg, idx) => (
-          <div key={idx} className="flex items-center text-xs text-zinc-400">
-            <span className="min-w-12 text-zinc-300 font-bold">
+          <div key={idx} className="flex items-center text-xs">
+            <span className="min-w-[56px] text-indigo-300/80 font-bold uppercase tracking-wider text-[10px] bg-indigo-500/10 px-1.5 py-0.5 rounded text-center">
               {leg.mode}
             </span>
-
-            <ArrowRight size={12} className="mx-1 opacity-40" />
-
-            <span className="truncate font-bold">
-              {leg.source} → {leg.destination}
+            <ArrowRight size={12} className="mx-2 text-neutral-600 shrink-0" />
+            <span className="truncate text-neutral-300 font-medium">
+              {leg.source} <span className="text-neutral-600 mx-1">→</span> {leg.destination}
             </span>
           </div>
         ))}
       </div>
-
-      {/* ---------- CTA ---------- */}
-
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect(route);
-        }}
-        className="w-full rounded-xl bg-orange-500 py-2.5 text-sm font-bold text-black transition hover:bg-orange-400 active:scale-[0.98] cursor-pointer"
-      >
-        Select route
-      </button>
     </div>
   );
 }

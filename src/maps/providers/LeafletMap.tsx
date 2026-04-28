@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import "@/lib/leaflet";
 import { useOSRMRoute } from "../hooks/useOSRMRoute";
-import { MapProps } from "@/types/journey";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
@@ -48,32 +47,38 @@ export default function LeafletMap({
       <MapContainer
         center={center}
         zoom={12}
-        className="h-full w-full"
+        className="h-full w-full bg-neutral-950"
         zoomControl={false}
         dragging={interactive}
         scrollWheelZoom={interactive}
       >
-        <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png" />
+        {/* ── FIX: Free, No-Auth Dark Mode Tiles from CartoDB ── */}
+        <TileLayer 
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" 
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        />
 
         {from && <Marker position={from} />}
         {to && <Marker position={to} />}
 
         {route && (
           <>
+            {/* Inner solid line (Indigo) */}
             <Polyline
               positions={route.coordinates}
               pathOptions={{
-                color: "#f97316",
-                weight: 6,
+                color: "#6366f1", 
+                weight: 5,
                 opacity: 1,
               }}
             />
+            {/* Outer glow line (Indigo) */}
             <Polyline
               positions={route.coordinates}
               pathOptions={{
-                color: "#f97316",
+                color: "#6366f1",
                 weight: 12,
-                opacity: 0.25,
+                opacity: 0.2,
               }}
             />
           </>

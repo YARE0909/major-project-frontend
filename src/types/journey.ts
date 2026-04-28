@@ -34,23 +34,49 @@ export type Journey = {
   travelPass?: TravelPass;
 };
 
+export type MapProps = {
+  legs: JourneyLeg[];
+  className?: string;
+  interactive?: boolean;
+  showCurrentLocation?: boolean;
+};
+
+export type RouteAlert = {
+  title: string;
+  detail: string;
+  severity: "low" | "medium" | "high";
+  locationHint: string;
+  sourceHint?: string;
+};
+
+export type JourneyRouteLeg = {
+  mode: string;
+  source: string;
+  destination: string;
+  duration: number;
+  cost: number;
+  fromCoords?: { lat: number; lon: number; displayName?: string };
+  toCoords?: { lat: number; lon: number; displayName?: string };
+  accessibility?: {
+    score: number;
+    issues: string[];
+  };
+  failureProbability?: number;
+  notes?: string[];
+};
 
 export type JourneyRoute = {
   id: string;
   name: string;
   source: string;
   destination: string;
-
-  legs: JourneyLeg[];
-
+  legs: JourneyRouteLeg[];
   totalTime: number;
   totalCost: number;
-
   failureProbability?: number;
-};
-export type MapProps = {
-  legs: JourneyLeg[];
-  className?: string;
-  interactive?: boolean;
-  showCurrentLocation?: boolean;
+  overallScore?: number;
+  rank?: number;
+  summary?: string;
+  notes?: string[];
+  alerts?: RouteAlert[];
 };

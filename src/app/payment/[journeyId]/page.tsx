@@ -11,9 +11,10 @@ import {
   CreditCard,
   ShieldCheck,
   MapPin,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 import Loader from "@/components/Loader";
+import { getToken } from "@/lib/auth";
 
 export default function PaymentPage({
   params,
@@ -61,17 +62,25 @@ export default function PaymentPage({
     }
   };
 
+  // ── Redirect if not logged in ──
+  useEffect(() => {
+    // If you don't have getToken exported, you can use: localStorage.getItem("token")
+    const token = getToken ? getToken() : null;
+
+    if (!token) {
+      router.push("/");
+    }
+  }, [router]);
+
   if (loading) return <Loader />;
   if (!journey) return null;
 
   return (
     <main className="relative min-h-[100dvh] w-full flex items-center justify-center bg-neutral-950 p-4 sm:p-6 font-[family-name:var(--font-geist-sans)] overflow-hidden">
-      
       {/* ── Ambient Background Glows ── */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none" />
-      
+
       <div className="relative w-full max-w-md space-y-6 z-10 animate-in fade-in slide-in-from-bottom-8 duration-500">
-        
         {/* ── Header ── */}
         <div className="text-center space-y-1.5">
           <div className="inline-flex items-center justify-center p-3 bg-neutral-900 border border-neutral-800 rounded-2xl mb-2 shadow-lg">
@@ -88,7 +97,7 @@ export default function PaymentPage({
         {/* ── Total Amount Card ── */}
         <div className="rounded-3xl border border-neutral-800 bg-neutral-900/60 p-8 text-center shadow-2xl backdrop-blur-xl relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
-          
+
           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
             Total Amount Payable
           </p>
@@ -117,7 +126,9 @@ export default function PaymentPage({
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MapPin size={14} className="text-neutral-400" />
-              <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-300">Journey Breakdown</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-300">
+                Journey Breakdown
+              </h2>
             </div>
             <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-500/20">
               {journey.legs.length} Segments
@@ -145,7 +156,10 @@ export default function PaymentPage({
 
                   <p className="text-xs font-medium text-neutral-200 truncate flex items-center gap-1.5">
                     {leg.source}
-                    <ArrowRight size={10} className="text-neutral-600 shrink-0" />
+                    <ArrowRight
+                      size={10}
+                      className="text-neutral-600 shrink-0"
+                    />
                     {leg.destination}
                   </p>
                 </div>
@@ -158,8 +172,12 @@ export default function PaymentPage({
           </div>
 
           <div className="mt-5 flex justify-between items-center border-t border-neutral-800/80 pt-4">
-            <span className="text-xs font-bold text-neutral-500 uppercase tracking-widest">Subtotal</span>
-            <span className="text-sm font-bold text-white">₹{journey.totalCost}</span>
+            <span className="text-xs font-bold text-neutral-500 uppercase tracking-widest">
+              Subtotal
+            </span>
+            <span className="text-sm font-bold text-white">
+              ₹{journey.totalCost}
+            </span>
           </div>
         </div>
 
@@ -187,7 +205,6 @@ export default function PaymentPage({
             </>
           )}
         </button>
-
       </div>
     </main>
   );

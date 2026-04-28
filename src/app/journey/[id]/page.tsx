@@ -1,9 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  JSXElementConstructor,
+  ReactElement,
+  ReactNode,
+  ReactPortal,
+  Key,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { api } from "@/lib/api";
 import { Journey } from "@/types/journey";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Clock,
@@ -18,16 +27,19 @@ import {
 } from "lucide-react";
 import Map from "@/components/Map";
 import Loader from "@/components/Loader";
+import { getToken } from "@/lib/auth";
 
 export default function JourneyDetailsPage() {
   const params = useParams();
   const journeyId = params.id as string;
 
-  const [journey, setJourney] = useState<Journey | null>(null);
+  const [journey, setJourney] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const router = useRouter();
 
   const fetchJourney = async () => {
     try {
@@ -72,6 +84,16 @@ export default function JourneyDetailsPage() {
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
+  // ── Redirect if not logged in ──
+  useEffect(() => {
+    // If you don't have getToken exported, you can use: localStorage.getItem("token")
+    const token = getToken ? getToken() : null;
+
+    if (!token) {
+      router.push("/");
+    }
+  }, [router]);
+
   if (loading) return <Loader />;
   if (!journey)
     return (
@@ -89,7 +111,9 @@ export default function JourneyDetailsPage() {
       </div>
     );
 
-  const qrLegs = journey.legs.filter((leg) => leg.travelPass?.qrData);
+  const qrLegs = journey.legs.filter(
+    (leg: { travelPass: { qrData: any } }) => leg.travelPass?.qrData,
+  );
 
   return (
     <main className="relative min-h-[100dvh] w-full bg-neutral-950 p-4 sm:p-6 font-[family-name:var(--font-geist-sans)] overflow-hidden">
@@ -97,7 +121,6 @@ export default function JourneyDetailsPage() {
       <div className="absolute top-[10%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative mx-auto max-w-md space-y-6 z-10 animate-in fade-in slide-in-from-bottom-8 duration-500 pb-8">
-        
         {/* ── Top Navigation & Header ── */}
         <div className="relative flex items-center justify-center mb-6 mt-2">
           {/* Back/Home Button */}
@@ -142,48 +165,137 @@ export default function JourneyDetailsPage() {
                   ref={carouselRef}
                   className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-2 pb-4 scrollbar-hide scroll-smooth"
                 >
-                  {qrLegs.map((leg, idx) => (
-                    <div
-                      key={leg.id || idx}
-                      className="snap-center shrink-0 w-full rounded-2xl border border-neutral-800 bg-neutral-950 p-5 shadow-inner flex flex-col items-center transition-all duration-300"
-                    >
-                      <div className="mb-4 w-full flex items-center justify-between">
-                        <span className="inline-block rounded bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-400">
-                          {leg.mode}
-                        </span>
-                        <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
-                          {idx + 1} of {qrLegs.length}
-                        </span>
-                      </div>
+                  {qrLegs.map(
+                    (
+                      leg: {
+                        id: any;
+                        mode:
+                          | string
+                          | number
+                          | bigint
+                          | boolean
+                          | ReactElement<
+                              unknown,
+                              string | JSXElementConstructor<any>
+                            >
+                          | Iterable<ReactNode>
+                          | ReactPortal
+                          | Promise<
+                              | string
+                              | number
+                              | bigint
+                              | boolean
+                              | ReactPortal
+                              | ReactElement<
+                                  unknown,
+                                  string | JSXElementConstructor<any>
+                                >
+                              | Iterable<ReactNode>
+                              | null
+                              | undefined
+                            >
+                          | null
+                          | undefined;
+                        source:
+                          | string
+                          | number
+                          | bigint
+                          | boolean
+                          | ReactElement<
+                              unknown,
+                              string | JSXElementConstructor<any>
+                            >
+                          | Iterable<ReactNode>
+                          | ReactPortal
+                          | Promise<
+                              | string
+                              | number
+                              | bigint
+                              | boolean
+                              | ReactPortal
+                              | ReactElement<
+                                  unknown,
+                                  string | JSXElementConstructor<any>
+                                >
+                              | Iterable<ReactNode>
+                              | null
+                              | undefined
+                            >
+                          | null
+                          | undefined;
+                        destination:
+                          | string
+                          | number
+                          | bigint
+                          | boolean
+                          | ReactElement<
+                              unknown,
+                              string | JSXElementConstructor<any>
+                            >
+                          | Iterable<ReactNode>
+                          | ReactPortal
+                          | Promise<
+                              | string
+                              | number
+                              | bigint
+                              | boolean
+                              | ReactPortal
+                              | ReactElement<
+                                  unknown,
+                                  string | JSXElementConstructor<any>
+                                >
+                              | Iterable<ReactNode>
+                              | null
+                              | undefined
+                            >
+                          | null
+                          | undefined;
+                        travelPass: { qrData: string | Blob | undefined };
+                      },
+                      idx: number,
+                    ) => (
+                      <div
+                        key={leg.id || idx}
+                        className="snap-center shrink-0 w-full rounded-2xl border border-neutral-800 bg-neutral-950 p-5 shadow-inner flex flex-col items-center transition-all duration-300"
+                      >
+                        <div className="mb-4 w-full flex items-center justify-between">
+                          <span className="inline-block rounded bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+                            {leg.mode}
+                          </span>
+                          <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
+                            {idx + 1} of {qrLegs.length}
+                          </span>
+                        </div>
 
-                      <p className="mb-4 text-center text-xs font-medium text-neutral-300 flex items-center gap-2">
-                        {leg.source}{" "}
-                        <ArrowRight size={12} className="text-neutral-600" />{" "}
-                        {leg.destination}
-                      </p>
+                        <p className="mb-4 text-center text-xs font-medium text-neutral-300 flex items-center gap-2">
+                          {leg.source}{" "}
+                          <ArrowRight size={12} className="text-neutral-600" />{" "}
+                          {leg.destination}
+                        </p>
 
-                      {/* White background behind QR to ensure scanning works on dark mode */}
-                      <div className="mx-auto flex aspect-square w-full max-w-[200px] items-center justify-center rounded-xl p-2 border-4 border-neutral-800 shadow-md">
-                        {leg.travelPass?.qrData ? (
-                          <img
-                            src={leg.travelPass.qrData}
-                            alt="Leg Travel Pass"
-                            className="h-full w-full rounded-lg object-contain"
-                          />
-                        ) : (
-                          <p className="text-sm text-zinc-500">
-                            Generating QR…
-                          </p>
-                        )}
+                        {/* White background behind QR to ensure scanning works on dark mode */}
+                        <div className="mx-auto flex aspect-square w-full max-w-[200px] items-center justify-center rounded-xl p-2 border-4 border-neutral-800 shadow-md">
+                          {leg.travelPass?.qrData ? (
+                            <img
+                              src={leg.travelPass.qrData}
+                              alt="Leg Travel Pass"
+                              className="h-full w-full rounded-lg object-contain"
+                            />
+                          ) : (
+                            <p className="text-sm text-zinc-500">
+                              Generating QR…
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
 
                 {/* Dots */}
                 {qrLegs.length > 1 && (
                   <div className="mt-2 flex justify-center gap-1.5">
-                    {qrLegs.map((_, idx) => (
+                    {qrLegs.map((_: any, idx: Key | null | undefined) => (
                       <span
                         key={idx}
                         className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -227,35 +339,113 @@ export default function JourneyDetailsPage() {
           </div>
 
           <div className="space-y-3 relative before:absolute before:inset-y-4 before:left-[11px] before:w-[2px] before:bg-neutral-800/80">
-            {journey.legs.map((leg, idx) => (
-              <div
-                key={idx}
-                className="relative pl-8 flex justify-between items-center group"
-              >
-                {/* Timeline Dot */}
-                <div className="absolute left-[7px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-neutral-950 border-2 border-neutral-600 group-hover:border-indigo-400 transition-colors z-10" />
+            {journey.legs.map(
+              (
+                leg: {
+                  mode:
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | ReactPortal
+                    | Promise<
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | ReactPortal
+                        | ReactElement<
+                            unknown,
+                            string | JSXElementConstructor<any>
+                          >
+                        | Iterable<ReactNode>
+                        | null
+                        | undefined
+                      >
+                    | null
+                    | undefined;
+                  source:
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | ReactPortal
+                    | Promise<
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | ReactPortal
+                        | ReactElement<
+                            unknown,
+                            string | JSXElementConstructor<any>
+                          >
+                        | Iterable<ReactNode>
+                        | null
+                        | undefined
+                      >
+                    | null
+                    | undefined;
+                  destination:
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactElement<unknown, string | JSXElementConstructor<any>>
+                    | Iterable<ReactNode>
+                    | ReactPortal
+                    | Promise<
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | ReactPortal
+                        | ReactElement<
+                            unknown,
+                            string | JSXElementConstructor<any>
+                          >
+                        | Iterable<ReactNode>
+                        | null
+                        | undefined
+                      >
+                    | null
+                    | undefined;
+                },
+                idx: number,
+              ) => (
+                <div
+                  key={idx}
+                  className="relative pl-8 flex justify-between items-center group"
+                >
+                  {/* Timeline Dot */}
+                  <div className="absolute left-[7px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-neutral-950 border-2 border-neutral-600 group-hover:border-indigo-400 transition-colors z-10" />
 
-                <div className="w-full rounded-xl bg-neutral-950/50 border border-neutral-800/80 p-3.5 shadow-sm group-hover:border-neutral-700 transition-colors">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="inline-block rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neutral-300">
-                      {leg.mode}
-                    </span>
-                    <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">
-                      Step {idx + 1}
-                    </span>
+                  <div className="w-full rounded-xl bg-neutral-950/50 border border-neutral-800/80 p-3.5 shadow-sm group-hover:border-neutral-700 transition-colors">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="inline-block rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neutral-300">
+                        {leg.mode}
+                      </span>
+                      <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">
+                        Step {idx + 1}
+                      </span>
+                    </div>
+
+                    <p className="text-xs font-medium text-neutral-200 flex items-center gap-1.5 truncate">
+                      {leg.source}
+                      <ArrowRight
+                        size={10}
+                        className="text-neutral-600 shrink-0"
+                      />
+                      {leg.destination}
+                    </p>
                   </div>
-
-                  <p className="text-xs font-medium text-neutral-200 flex items-center gap-1.5 truncate">
-                    {leg.source}
-                    <ArrowRight
-                      size={10}
-                      className="text-neutral-600 shrink-0"
-                    />
-                    {leg.destination}
-                  </p>
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </div>
 

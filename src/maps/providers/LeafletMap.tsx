@@ -25,7 +25,7 @@ export default function LeafletMap({
   legs,
   className,
   interactive = true,
-}: MapProps) {
+}: any) {
   const firstLeg = legs?.[0];
   const lastLeg = legs?.[legs.length - 1];
 

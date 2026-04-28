@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -21,7 +21,7 @@ async function comparePassword(plain: string, hash: string) {
   return bcrypt.compare(plain, hash);
 }
 
-function signJwt(payload: object, expiresIn: string = "7d") {
+function signJwt(payload: object, expiresIn: SignOptions["expiresIn"] = "7d") {
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn,
   });

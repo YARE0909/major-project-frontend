@@ -12,6 +12,9 @@
   "dependencies": {
     "@google/genai": "^1.50.1",
     "@prisma/client": "^5.2.0",
+    "@tensorflow-models/coco-ssd": "^2.2.3",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "jsonwebtoken": "^9.0.3",

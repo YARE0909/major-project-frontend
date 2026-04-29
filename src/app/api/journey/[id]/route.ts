@@ -15,7 +15,8 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
-export async function geocode(place: string) {
+// Removed 'export' - internal helper function
+async function geocode(place: string) {
   const res = await fetch(
     `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
       place
@@ -38,7 +39,8 @@ export async function geocode(place: string) {
   };
 }
 
-export default async function hydrateLegCoords(legs: any[]) {
+// Removed 'export default' - internal helper function
+async function hydrateLegCoords(legs: any[]) {
   return Promise.all(
     legs.map(async (leg) => {
       const from = await geocode(leg.source);
@@ -53,7 +55,8 @@ export default async function hydrateLegCoords(legs: any[]) {
   );
 }
 
-export const getJourneyByIdService = async (journeyId: string) => {
+// Removed 'export' - internal helper function
+const getJourneyByIdService = async (journeyId: string) => {
   const journey = await prisma.journey.findUnique({
     where: { id: journeyId },
     include: {
@@ -78,6 +81,7 @@ export const getJourneyByIdService = async (journeyId: string) => {
   };
 };
 
+// ONLY the HTTP method should be exported in a route.ts file
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
